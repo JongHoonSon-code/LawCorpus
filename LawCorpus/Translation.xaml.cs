@@ -34,12 +34,17 @@ namespace LawCorpus
         private string transUrl;
         public Translation()
         {
-            InitializeComponent();            
-            googleKey = "Your google key";
-            papagoKey = "Your papago key";
-            papagoKeyId = "Your papago key id";
-            bleuUrl = "bleu URL";
-            transUrl = "trans URL";
+            InitializeComponent();
+            googleKey = "AIzaSyDMxAw0FuW96bQl62-xvwKh4NxNB2bmdck";
+            papagoKey = "sTXZ45UVbh0T6ysuYrtVvkbFSjUZYAC93Y4PgKMV";
+            papagoKeyId = "i3g8ns7ous";
+            bleuUrl = "http://211.200.31.18:8020";
+            transUrl = "http://211.200.31.34";
+            //googleKey = "Your google key";
+            //papagoKey = "Your papago key";
+            //papagoKeyId = "Your papago key id";
+            //bleuUrl = "bleu URL";
+            //transUrl = "trans URL";
         }
 
         private async void trans_Click(object sender, RoutedEventArgs e)
