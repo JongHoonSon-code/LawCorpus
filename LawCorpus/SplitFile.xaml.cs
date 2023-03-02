@@ -27,19 +27,19 @@ namespace LawCorpus
         }
 
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
-        {
+        {               
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
             {
                 string directoryPath = System.IO.Path.GetDirectoryName(openFileDialog.FileName);
 
                 //validation 데이터 추출을 위한 랜덤값 생성(전체 데이터의 10%)
-                Dictionary<int, int> validRows = new Dictionary<int, int>();
+                Dictionary<int, int>validRows = new Dictionary<int, int>();
                 int randValue;
                 Random rand = new Random();
-                while(validRows.Count < 130000)
+                while(validRows.Count <136000)
                 {
-                    randValue = rand.Next(1300000);
+                    randValue = rand.Next(1360000);
                     if (!validRows.ContainsKey(randValue))
                     {
                         validRows.Add(randValue, 0);
@@ -49,17 +49,30 @@ namespace LawCorpus
                 int row = 0;
                 StreamWriter trainFile = new StreamWriter(System.IO.Path.Combine(directoryPath, "train.txt"));
                 StreamWriter validFile = new StreamWriter(System.IO.Path.Combine(directoryPath, "valid.txt"));
+                StreamWriter sourceFile = new StreamWriter(System.IO.Path.Combine(directoryPath, "source.txt"));
+                StreamWriter targetFile = new StreamWriter(System.IO.Path.Combine(directoryPath, "target.txt"));
+                string[] temp;
                 //전체 데이터를 반복하며 랜덤생성한 값과 일치한 row는 valid.txt로 아니면 train.txt로 저장하여 학습/검증 데이터 분리
                 foreach (string line in File.ReadLines(openFileDialog.FileName))
                 {
                     if (validRows.ContainsKey(row))
                         validFile.WriteLine(line);
                     else
+                    {
                         trainFile.WriteLine(line);
+                        temp = line.Split('\t', StringSplitOptions.RemoveEmptyEntries);
+                        if (temp.Length == 2)
+                        {
+                            sourceFile.WriteLine(temp[0]);
+                            targetFile.WriteLine(temp[1]);
+                        }
+                    }
                     row++;
                 }
                 trainFile.Close();
                 validFile.Close();
+                sourceFile.Close();
+                targetFile.Close();
 
                 MessageBox.Show("파일 분리가 완료되었습니다.");
             }

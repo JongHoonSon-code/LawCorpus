@@ -10,7 +10,7 @@ namespace LawCorpus
     public static class Common
     {
         public static Regex regHanja = new Regex(@"\([\u2e80-\u2eff\u31c0-\u31ef\u3200-\u32ff\u3400-\u4dbf\u4e00-\u9fbf\uf900-\ufaff]+\)|[\u2e80-\u2eff\u31c0-\u31ef\u3200-\u32ff\u3400-\u4dbf\u4e00-\u9fbf\uf900-\ufaff]+|\([一-龥]+\)|[一-龥]+");
-        public static Regex regSpecialChar = new Regex(@"&lt;|&gt;|<BR>|\n|\t|<img id=""\d""></img>|\[[a-zA-Z\s0-9.,]+\](?=[\r\n])|;$");
+        public static Regex regSpecialChar = new Regex(@"&lt;|&gt;|<BR>|\n|\t|<img id=""\d+""></img>|\[[a-zA-Z\s0-9.,]+\](?=[\r\n])|;$");
         public static Regex regSplit = new Regex(@"([\.:]\s)(?=(<|다만|다만,|단,|이 경우|Provided|In))");
         public static Regex regLength = new Regex(@" ㆍ");
         public static Dictionary<string, string> sentences = new Dictionary<string, string>();
@@ -101,6 +101,11 @@ namespace LawCorpus
 
         public static bool HeadCheck(Regex reg, Regex regDigit, string koCon, string enCont)
         {
+            string[] tempEnCont = enCont.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            if (tempEnCont.Length > 1 && tempEnCont[1].StartsWith("["))
+            {
+                enCont = tempEnCont[0];
+            }
             string koHead = reg.Match(koCon).Value;
             string enHead = reg.Match(enCont).Value;
             if (HeadNumCheck(regDigit, koHead, enHead))

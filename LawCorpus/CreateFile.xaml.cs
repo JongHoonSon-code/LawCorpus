@@ -66,12 +66,12 @@ namespace LawCorpus
             totalCount = Convert.ToInt32(doc.GetElementsByTagName("totalCnt")[0].InnerText);
             int pageCount = (int)Math.Ceiling((decimal)(totalCount / 100));
 
-            await ListIter(doc.GetElementsByTagName("법령ID"));
+            await ListIter(doc.GetElementsByTagName("법령ID"), doc.GetElementsByTagName("공포일자"), doc.GetElementsByTagName("공포번호"));
             for (int i = 1; i <= pageCount; i++)
             {
                 data = await GetData(i);
                 doc.LoadXml(data);
-                await ListIter(doc.GetElementsByTagName("법령ID"));
+                await ListIter(doc.GetElementsByTagName("법령ID"), doc.GetElementsByTagName("공포일자"), doc.GetElementsByTagName("공포번호"));
             }
 
             using (StreamWriter wr = new StreamWriter("result.tsv", false, Encoding.UTF8))
@@ -126,11 +126,12 @@ namespace LawCorpus
             return result;
         }
 
-        private async Task ListIter(XmlNodeList list)
+        private async Task ListIter(XmlNodeList list, XmlNodeList ldList, XmlNodeList lnList)
         {
+            int listCnt = 0;
             foreach (XmlNode item in list)
             {
-                HttpResponseMessage response = serviceClient.GetAsync($"?OC=john9005&target=law&type=XML&ID={item.InnerText}").Result;
+                HttpResponseMessage response = serviceClient.GetAsync($"?OC=john9005&target=law&type=XML&ID={item.InnerText}&LD={ldList[listCnt].InnerText}&LN={lnList[listCnt].InnerText}").Result;
                 string resultKo = "";
 
                 if (response.IsSuccessStatusCode)
@@ -155,6 +156,7 @@ namespace LawCorpus
                     docEn.LoadXml(resultEn);
                     Mapping(docKo, docEn);
                 }
+                listCnt++;
             }
         }
 
@@ -264,14 +266,14 @@ namespace LawCorpus
                     }
                     else
                     {
-                        enCnt = 0;
-                        Common.HeadCheck(regJo, regDigit, koContents, Common.GetMatchValue(matches, enCnt, temp));
-                        enCnt++;
-
-                        if (joUnit.InnerText.Contains("① 식품의약품안전처장은 법 제32조의2제1항 각 호 외의 부분에 따른 현지실사(이하"))
+                        if (joUnit.InnerText.Contains("다만, 집회의 성격상 부득이하여 주최자가 질서유지인을 두고 미리 신고한 경우에는 관할경찰관서장은 질서 유지를 위한 조"))
                         {
 
                         }
+
+                        enCnt = 0;
+                        Common.HeadCheck(regJo, regDigit, koContents, Common.GetMatchValue(matches, enCnt, temp));
+                        enCnt++;                        
 
                         if (joUnit["항"] != null)
                         {
