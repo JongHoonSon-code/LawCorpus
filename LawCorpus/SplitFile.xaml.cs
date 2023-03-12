@@ -34,21 +34,32 @@ namespace LawCorpus
                 string directoryPath = System.IO.Path.GetDirectoryName(openFileDialog.FileName);
 
                 //validation 데이터 추출을 위한 랜덤값 생성(전체 데이터의 10%)
-                Dictionary<int, int>validRows = new Dictionary<int, int>();
+                Dictionary<int, int> validRows = new Dictionary<int, int>();
+                Dictionary<int, int> testRows = new Dictionary<int, int>();
                 int randValue;
                 Random rand = new Random();
-                while(validRows.Count <136000)
+                while(validRows.Count < 94000)
                 {
-                    randValue = rand.Next(1360000);
+                    randValue = rand.Next(940000);
                     if (!validRows.ContainsKey(randValue))
                     {
                         validRows.Add(randValue, 0);
                     }
                 }
 
+                while (testRows.Count < 1000)
+                {
+                    randValue = rand.Next(940000);
+                    if (!testRows.ContainsKey(randValue) && !validRows.ContainsKey(randValue))
+                    {
+                        testRows.Add(randValue, 0);
+                    }
+                }
+
                 int row = 0;
                 StreamWriter trainFile = new StreamWriter(System.IO.Path.Combine(directoryPath, "train.txt"));
                 StreamWriter validFile = new StreamWriter(System.IO.Path.Combine(directoryPath, "valid.txt"));
+                StreamWriter testFile = new StreamWriter(System.IO.Path.Combine(directoryPath, "test.txt"));
                 StreamWriter sourceFile = new StreamWriter(System.IO.Path.Combine(directoryPath, "source.txt"));
                 StreamWriter targetFile = new StreamWriter(System.IO.Path.Combine(directoryPath, "target.txt"));
                 string[] temp;
@@ -57,15 +68,18 @@ namespace LawCorpus
                 {
                     if (validRows.ContainsKey(row))
                         validFile.WriteLine(line);
+                    else if (testRows.ContainsKey(row))
+                        testFile.WriteLine(line);
                     else
                     {
-                        trainFile.WriteLine(line);
-                        temp = line.Split('\t', StringSplitOptions.RemoveEmptyEntries);
-                        if (temp.Length == 2)
-                        {
-                            sourceFile.WriteLine(temp[0]);
-                            targetFile.WriteLine(temp[1]);
-                        }
+                        trainFile.WriteLine(line);                        
+                    }
+
+                    temp = line.Split('\t', StringSplitOptions.RemoveEmptyEntries);
+                    if (temp.Length == 2)
+                    {
+                        sourceFile.WriteLine(temp[0]);
+                        targetFile.WriteLine(temp[1]);
                     }
                     row++;
                 }
@@ -73,6 +87,7 @@ namespace LawCorpus
                 validFile.Close();
                 sourceFile.Close();
                 targetFile.Close();
+                testFile.Close();
 
                 MessageBox.Show("파일 분리가 완료되었습니다.");
             }
